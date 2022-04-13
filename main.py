@@ -45,7 +45,7 @@ def get_sudoku():
     else:
         options = webdriver.ChromeOptions()
         options.add_argument('headless')
-        options.add_argument('no-sandbox') 
+        options.add_argument('--no-sandbox') 
         driver = webdriver.Chrome(executable_path=DRIVER_PATH, chrome_options=options)
         print("Started webdriver at {}".format(datetime.now().strftime("%H:%M")))
     driver.maximize_window()
