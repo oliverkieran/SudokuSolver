@@ -10,7 +10,7 @@ from sudoku_solver import explicit_solver as solve_sudoku
 from cases import coop, migros
 
 
-debug = True # Will run in headless mode, if set to False
+debug = False # Will run in headless mode, if set to False
 case = "coop"
 
 
@@ -45,6 +45,7 @@ def get_sudoku():
     else:
         options = webdriver.ChromeOptions()
         options.add_argument('headless')
+        options.add_argument('no-sandbox') 
         driver = webdriver.Chrome(executable_path=DRIVER_PATH, chrome_options=options)
         print("Started webdriver at {}".format(datetime.now().strftime("%H:%M")))
     driver.maximize_window()
