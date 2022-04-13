@@ -1,4 +1,5 @@
 # from selenium import webdriver
+from argparse import ArgumentParser
 from seleniumwire import webdriver
 from time import sleep, time
 from datetime import datetime
@@ -11,8 +12,6 @@ from cases import coop, migros
 
 
 debug = False # Will run in headless mode, if set to False
-case = "coop"
-
 
 def _create_initial_sudoku(sudoku_info):
     initial_sudoku = np.zeros((9, 9))
@@ -37,7 +36,7 @@ def get_initial_setup(driver):
     return None, None
 
 
-def get_sudoku():
+def get_sudoku(case):
     DRIVER_PATH = '/Users/oli/Documents/Webdriver/chromedriver_mac64_m1'
     #DRIVER_PATH = '/usr/lib/chromium-browser/chromedriver' #for Raspberry Pi
     if debug:
@@ -60,9 +59,9 @@ def get_sudoku():
     return initial_sudoku, prize_fields, url
 
 
-def main():
+def main(case):
 	# Get path of saved sukoku image and the prize fields
-	initial_sudoku, prize_fields, url = get_sudoku()
+	initial_sudoku, prize_fields, url = get_sudoku(case)
 	#sudoku_path, prize_fields, url = ("images/48_2020_sudoku_of_the_week.png", [12,13,14], "https://www.coopzeitung.ch/raetsel/2018/sudoku-aus-der-coopzeitung-137607/")
 
 	
@@ -102,11 +101,14 @@ def main():
 		""".format(initial_sudoku)
 	telegram_send.send(messages=[message])
 
+parser = ArgumentParser()
+parser.add_argument("-c", "--case", type=str, default="coop")
 
 if __name__ == '__main__':
     #try:
     start_time = time()
-    main()
+    args = parser.parse_args()
+    main(args.case)
     print("TAT: ", round(time() - start_time, 3))
     #except:
     #    print('[ERROR]: Image not found')
