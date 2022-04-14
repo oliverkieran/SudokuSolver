@@ -1,17 +1,19 @@
+from copy import deepcopy
+
 subtract_set = {1,2,3,4,5,6,7,8,9}
-"""
-sudoku = [
-[9, 0, 0, 2, 5, 0, 0, 0, 3],
- [0, 4, 0, 9, 0, 0, 0, 7, 0],
- [0, 0, 0, 0, 3, 0, 0, 0, 0],
- [0, 0, 0, 0, 0, 0, 0, 1, 7],
- [6, 0, 8, 0, 0, 0, 9, 0, 5],
- [3, 2, 0, 0, 0, 0, 0, 0, 0],
- [0, 0, 0, 0, 7, 0, 0, 0, 0],
- [0, 7, 0, 0, 0, 1, 0, 9, 0],
- [5, 0, 0, 0, 6, 3, 0, 0, 1]
+
+sudoku_hardcoded = [
+[0, 6, 8, 0, 0, 0, 0, 9, 0],
+[9, 0, 5, 8, 6, 0, 0, 4, 0],
+[7, 0, 0, 0, 0, 9, 0, 6, 8],
+[5, 2, 0, 6, 4, 1, 9, 8, 0],
+[4, 0, 6, 5, 9, 8, 0, 0, 2],
+[8, 9, 1, 2, 7, 3, 4, 5, 6],
+[1, 5, 9, 3, 8, 6, 0, 0, 4],
+[0, 8, 0, 0, 0, 0, 6, 0, 9],
+[6, 0, 0, 9, 0, 0, 8, 3, 0]
 ]
-"""
+
 
 
 def check_horizontal(i,j, sudoku):
@@ -26,10 +28,7 @@ def check_vertical(i, j, sudoku):
 
 
 def check_square(i, j, sudoku):
-    first = [0,1,2]
-    second = [3,4,5]
-    third = [6,7,8]
-    find_square = [first, second, third]
+    find_square = [[0,1,2], [3,4,5], [6,7,8]]
     for l in find_square:
         if i in l:
             row = l
@@ -49,7 +48,7 @@ def get_poss_vals(i, j, sudoku):
     return poss_vals
 
 
-def explicit_solver(sudoku):
+def explicit_solver(sudoku, copied=False):
     finished = False
     while not finished:
         print("starting new round")
@@ -64,14 +63,16 @@ def explicit_solver(sudoku):
                         sudoku[i][j] = list(poss_vals)[0]
                         new_numbers += 1
                     else:
-                        #print("Using implicit solver")
                         if implicit_solver(i,j,sudoku):
                             new_numbers += 1
                         else:
                             finished = False
         if new_numbers == 0:
-            print("Didn't find a solution.")
-            break
+            if copied:
+                print("Didn't find a solution.")
+                return sudoku, False
+            else:
+                sudoku, finished = backtrack_solver(sudoku)
         else:
             print("Found {} new numbers".format(new_numbers))
     return sudoku, finished
@@ -128,6 +129,21 @@ def implicit_solver(i, j, sudoku):
     return False
 
 
+def backtrack_solver(sudoku):
+    for i in range(9):
+        for j in range(9):
+            if sudoku[i][j] == 0:
+                poss_vals = get_poss_vals(i, j, sudoku)
+                if len(poss_vals) == 2:
+                    for poss_val in poss_vals:
+                        sudoku_copy = deepcopy(sudoku)
+                        sudoku_copy[i][j] = poss_val
+                        sudoku_solution, finished = explicit_solver(sudoku_copy, copied=True)
+                        if finished:
+                            return sudoku_solution, True
+    return sudoku, False
+
+
 def main(sudoku):
     try:
         result, finished = explicit_solver(sudoku)
@@ -139,5 +155,5 @@ def main(sudoku):
         print("Didn't finish :(")
 
 
-#if __name__=="__main__":
-#    main(sudoku)
+if __name__=="__main__":
+    main(sudoku_hardcoded)
