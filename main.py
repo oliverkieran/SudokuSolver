@@ -94,11 +94,10 @@ def main(case):
 	else:
 		message = """
 		Sudoku could NOT be solved :( 
-		There might have been a problem with the digit extraction.
 		This is what was extracted:
 
 		{}
-		""".format(initial_sudoku)
+		""".format(np.array(solution))
 	telegram_send.send(messages=[message])
 
 parser = ArgumentParser()
