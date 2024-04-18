@@ -1,7 +1,7 @@
 from selenium import webdriver
-from time import sleep, time
-from datetime import datetime
+from time import sleep
 from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.support.select import Select
 
 
 def submit_solution(prize_nrs):
@@ -9,44 +9,33 @@ def submit_solution(prize_nrs):
 	solution = "".join([str(i) for i in prize_nrs])
 	surname = "Oliver"
 	lastname = "Lehmann"
-	address = "Querstrasse 6"
+	address = "Querstrasse"
+	address_nr = "6"
 	plz = "8050"
 	city = "Zurich"
 	email = "lehmannoliver96@gmail.com"
 
 
-	DRIVER_PATH = '/Users/Oli/Documents/Webdriver/chromedriver'
+	DRIVER_PATH = '/Users/Oli/Documents/Webdriver/chromedriver_mac64_m1'
 	driver = webdriver.Chrome(executable_path=DRIVER_PATH)
 	driver.maximize_window()
-	driver.get('https://www.coopzeitung.ch/raetsel/')
+	driver.get('https://www.migros.ch/de/unternehmen/medien/publikationen/magazin/sudoku.html')
 	sleep(5)
 
 	try:
-		links = driver.find_element_by_xpath("//div[@class='item-list']").find_elements_by_tag_name("a")
-		for link in links:
-			if "sudoku" in link.get_attribute('href'):
-				link.click()
-				break
-		sleep(5)
-	except Exception as e:
-		print(e)
-		driver.close()
-
-	try:
 		# Fill out submit form
-		driver.find_element_by_xpath("//input[@id='loesung-sudoku']").send_keys(solution)
-		gender_button = driver.find_element_by_xpath("//input[@id='anrede-0']")
-		ActionChains(driver).move_to_element(gender_button).click(gender_button).perform()
-		driver.find_element_by_xpath("//input[@id='loesung-sudoku']").send_keys(solution)
-		driver.find_element_by_xpath("//input[@id='vorname']").send_keys(surname)
-		driver.find_element_by_xpath("//input[@id='nachname']").send_keys(lastname)
-		driver.find_element_by_xpath("//input[@id='adresse']").send_keys(address)
-		driver.find_element_by_xpath("//input[@id='plz']").send_keys(plz)
-		driver.find_element_by_xpath("//input[@id='ort']").send_keys(city)
-		driver.find_element_by_xpath("//input[@id='email']").send_keys(email)
-		box_privacy = driver.find_element_by_xpath("//input[@id='checkPrivacy']")
+		driver.find_element_by_xpath("//input[@id='ref-solution']").send_keys(solution)
+		Select(driver.find_element_by_xpath("//select[@id='ref-salutation']")).select_by_value("m")
+		driver.find_element_by_xpath("//input[@id='ref-firstName']").send_keys(surname)
+		driver.find_element_by_xpath("//input[@id='ref-lastName']").send_keys(lastname)
+		driver.find_element_by_xpath("//input[@id='ref-email']").send_keys(email)
+		driver.find_element_by_xpath("//input[@id='ref-plz']").send_keys(plz)
+		driver.find_element_by_xpath("//input[@id='ref-ort']").send_keys(city)
+		driver.find_element_by_xpath("//input[@id='ref-strasse']").send_keys(address)
+		driver.find_element_by_xpath("//input[@id='ref-hausnummer']").send_keys(address_nr)
+		box_privacy = driver.find_element_by_xpath("//input[@id='ref-teilnahmebedingungen-label']")
 		ActionChains(driver).move_to_element(box_privacy).click(box_privacy).perform()
-		submit_button = driver.find_element_by_xpath("//button[@id='btnSubmit']")
+		submit_button = driver.find_element_by_xpath("//button[@name='formsubmit']")
 		#ActionChains(driver).move_to_element(submit_button).click(submit_button).perform()
 		#driver.close()
 		#return True
@@ -55,7 +44,7 @@ def submit_solution(prize_nrs):
 		print(e)
 
 	sleep(5)
-	#driver.close()
+	driver.close()
 
 # Submit solution manually 
 submit_solution([1,2,3])

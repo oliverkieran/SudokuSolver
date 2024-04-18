@@ -8,6 +8,7 @@ import numpy as np
 import telegram_send
 
 from sudoku_solver import explicit_solver as solve_sudoku
+from submit_solution import submit_solution
 from cases import coop, migros
 
 
@@ -60,28 +61,30 @@ def get_sudoku(case):
 
 
 def main(case):
-	# Get path of saved sukoku image and the prize fields
-	initial_sudoku, prize_fields, url = get_sudoku(case)
-	#sudoku_path, prize_fields, url = ("images/48_2020_sudoku_of_the_week.png", [12,13,14], "https://www.coopzeitung.ch/raetsel/2018/sudoku-aus-der-coopzeitung-137607/")
+    # Get path of saved sukoku image and the prize fields
+    initial_sudoku, prize_fields, url = get_sudoku(case)
+    #sudoku_path, prize_fields, url = ("images/48_2020_sudoku_of_the_week.png", [12,13,14], "https://www.coopzeitung.ch/raetsel/2018/sudoku-aus-der-coopzeitung-137607/")
 
-	
 
-	# Solve the sudoku
-	solution, finished = solve_sudoku(initial_sudoku.tolist())
 
-	prize_nrs = []
-	if finished:
-		# Extract the prize numbers from the returned solution
-		for prize_row, prize_column in prize_fields:
-			prize_nrs.append(solution[prize_row][prize_column])
-		# Print solution
-		for row in solution:
-			print(row)
-		print("Prize numbers {}".format(prize_nrs))
+    # Solve the sudoku
+    solution, finished = solve_sudoku(initial_sudoku.tolist())
 
-		# Submit solution on the coop webpage
-		#submitted = submit_solution(prize_nrs)
-		message = """
+    prize_nrs = []
+    if finished:
+        # Extract the prize numbers from the returned solution
+        for prize_row, prize_column in prize_fields:
+            prize_nrs.append(solution[prize_row][prize_column])
+        # Print solution
+        for row in solution:
+            print(row)
+        print("Prize numbers {}".format(prize_nrs))
+
+        if case == "migros":
+            # Submit solution on the migros webpage
+            submitted = submit_solution(prize_nrs)
+                
+        message = """
 		CONGRATS!!
 		The weekly {case} sudoku was sucessfully solved! 
 		The prize numbers are the following:
@@ -90,15 +93,15 @@ def main(case):
 
 		{url}
 		""".format(case=case, nrs=prize_nrs, url=url)
-
-	else:
-		message = """
-		Sudoku could NOT be solved :( 
-		This is what was extracted:
+    
+    else:
+        message = """
+        Sudoku could NOT be solved :( 
+        This is what was extracted:
 
 		{}
 		""".format(np.array(solution))
-	telegram_send.send(messages=[message])
+    telegram_send.send(messages=[message])
 
 parser = ArgumentParser()
 parser.add_argument("-c", "--case", type=str, default="coop")
